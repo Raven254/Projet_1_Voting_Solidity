@@ -45,6 +45,9 @@ mapping(address => Proposal) public proposalsID; //Détail des propositions par 
 // Tableau non fini répertoriant les propositions
 Proposal[] public proposals;
 
+// ID de la proposition gagnante
+uint winningProposalId = 0;
+
 // Fonction pour retrouver le nombre de propositions
 function proposalsNumber() public returns(uint){
     return proposals.length+1;
@@ -61,9 +64,67 @@ WorkflowStatus public statut = WorkflowStatus.RegisteringVoters;
 //-----------------------------------------------------------
 
 
-// Enregistrement des électeurs
+// PHASE 0 : Enregistrement des électeurs
 function whitelist(address _address) external onlyOwner {
-    require()
+        require(votersID[_address].isRegistered == false);
+    require(statut == WorkflowStatus.RegisteringVoters);
+    votersID[_address].isRegistered = true;
+    emit VoterRegistered(_address); // Envoie l'info à l'interface que l'électeur est enregistré
 }
 
+// PHASE 1 : Enregistrement des propositions
+
+// 1 - Changement de phase --> Enregistrement des propositions
+function startingRegistration() external onlyOwner {
+    require(statut == WorkflowStatus.RegisteringVoters);
+    statut = WorkflowStatus.ProposalsRegistrationStarted;
+    emit WorkflowStatusChange(WorkflowStatus.RegisteringVoters, WorkflowStatus.ProposalsRegistrationStarted); // Envoie l'info à l'interface que le statut a changé
+}
+
+// 2 - Enregistrement des propositions
+
+// *FONCTION ENREGISTREMENT*
+// require whitelisté et le bon state
+
+// 3 - Fin de la phase d'enregistrement
+function endingRegistration() external onlyOwner {
+    require(statut == WorkflowStatus.ProposalsRegistrationStarted);
+    statut = WorkflowStatus.ProposalsRegistrationEnded;
+    emit WorkflowStatusChange(WorkflowStatus.ProposalsRegistrationStarted, WorkflowStatus.ProposalsRegistrationEnded); // Envoie l'info à l'interface que le statut a changé
+}
+
+// PHASE 2 : Phase de vote
+
+// 1 - Changement de phase --> Vote
+function startingVote() external onlyOwner {
+    require(statut == WorkflowStatus.ProposalsRegistrationEnded);
+    statut = WorkflowStatus.VotingSessionStarted;
+    emit WorkflowStatusChange(WorkflowStatus.ProposalsRegistrationEnded, WorkflowStatus.VotingSessionStarted); // Envoie l'info à l'interface que le statut a changé
+}
+
+// 2 - Enregistrement des votes
+
+// *FONCTION VOTES*
+// require whitelisté et le bon state
+
+// 3 - Fin de la phase de vote
+function startingVote() external onlyOwner {
+    require(statut == WorkflowStatus.VotingSessionStarted);
+    statut = WorkflowStatus.VotingSessionEnded;
+    emit WorkflowStatusChange(WorkflowStatus.VotingSessionStarted, WorkflowStatus.VotingSessionEnded); // Envoie l'info à l'interface que le statut a changé
+}
+
+// PHASE 3 : Phase de dépouillement des votes
+
+// 1 - Comptabilisation des votes
+
+// *FONCTION COMPTABILISATION*
+// require le bon state + onlyOwner
+// Renseigne l'uint winningProposalId, ou alors placer la fonction getWinner
+
+// 3 - Fin de la phase de comptabilisation
+function startingVote() external onlyOwner {
+    require(statut == WorkflowStatus.VotingSessionEnded);
+    statut = WorkflowStatus.VotesTallied;
+    emit WorkflowStatusChange(WorkflowStatus.VotingSessionEnded, WorkflowStatus.VotesTallied); // Envoie l'info à l'interface que le statut a changé
 }
