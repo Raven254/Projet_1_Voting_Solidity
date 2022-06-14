@@ -174,7 +174,7 @@ function endingVote() external onlyOwner {
 function voteCounting() external onlyOwner returns(uint) {
     require(statut == WorkflowStatus.VotingSessionEnded);
     uint IdCount = 0; // On garde cette variable pour suivre la proposition avec le max de votes.
-    for(uint i = 1; i <= proposalId - 1; i++) { // Boucle pour trouver le maximum, en comparant la clé i-1 avec la clé i.
+    for(uint i = 1; i <= proposals.length - 1; i++) { // Boucle pour trouver le maximum, en comparant la clé i-1 avec la clé i.
         if (proposals[i].voteCount > proposals[i-1].voteCount){ // Cela peut occasionner un bug si 2 comptes sont égaux... Voir comment gérer
             IdCount = i;
         } else {
