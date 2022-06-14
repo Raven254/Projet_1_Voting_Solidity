@@ -7,7 +7,7 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contr
 contract Voting is Ownable {
 
 //-----------------------------------------------------------
-//---------------Initialisation du WOrkflow------------------
+//---------------Initialisation du Workflow------------------
 //-----------------------------------------------------------
 
 // Définition des évènements du workflow
