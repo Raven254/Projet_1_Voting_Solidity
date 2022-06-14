@@ -46,7 +46,6 @@ mapping(address => Proposal) public proposalsID; //Détail des propositions par 
 // Tableau non fini répertoriant les propositions
 Proposal[] public proposals;
 
-<<<<<<< HEAD
 // ID de la proposition (incrementé dans une fonction pour chaque proposition)
 uint public proposalId = 0; // Peut être appelé pour savoir le nombre de propositions
 
@@ -64,34 +63,26 @@ WorkflowStatus public statut = WorkflowStatus.RegisteringVoters;
 // Fonction pour retourner à l'étape d'enregistrement des électeurs et tout recommencer
 // function à faire dans un second temps s'il me reste du temps
 
-<<<<<<< HEAD
 
-=======
->>>>>>> e1791d06e3044e4d23b2f152eaec331e173f9a51
 //-----------------------------------------------------------
 //----------------LANCEMENT DU WORKFLOW----------------------
 //-----------------------------------------------------------
 
-<<<<<<< HEAD
 // PHASE 0 : Enregistrement des électeurs
 function whitelist(address _address) external onlyOwner {
     require(votersID[_address].isRegistered == false);
-=======
+}
 
 // PHASE 0 : Enregistrement des électeurs
 function whitelist(address _address) external onlyOwner {
-        require(votersID[_address].isRegistered == false);
->>>>>>> e1791d06e3044e4d23b2f152eaec331e173f9a51
+    require(votersID[_address].isRegistered == false);
     require(statut == WorkflowStatus.RegisteringVoters);
     votersID[_address].isRegistered = true;
     emit VoterRegistered(_address); // Envoie l'info à l'interface que l'électeur est enregistré
 }
 
-<<<<<<< HEAD
 //-----------------------------------------------------------
 
-=======
->>>>>>> e1791d06e3044e4d23b2f152eaec331e173f9a51
 // PHASE 1 : Enregistrement des propositions
 
 // 1 - Changement de phase --> Enregistrement des propositions
@@ -103,7 +94,6 @@ function startingRegistration() external onlyOwner {
 
 // 2 - Enregistrement des propositions
 
-<<<<<<< HEAD
 function registration(string _description) external {
     require(statut == WorkflowStatus.ProposalsRegistrationStarted);
     require(votersID[msg.sender].isRegistered == true);
@@ -112,10 +102,9 @@ function registration(string _description) external {
     emit ProposalRegistered(proposalId);
     proposalId += 1;
 }
-=======
+
 // *FONCTION ENREGISTREMENT*
 // require whitelisté et le bon state
->>>>>>> e1791d06e3044e4d23b2f152eaec331e173f9a51
 
 // 3 - Fin de la phase d'enregistrement
 function endingRegistration() external onlyOwner {
@@ -124,7 +113,6 @@ function endingRegistration() external onlyOwner {
     emit WorkflowStatusChange(WorkflowStatus.ProposalsRegistrationStarted, WorkflowStatus.ProposalsRegistrationEnded); // Envoie l'info à l'interface que le statut a changé
 }
 
-<<<<<<< HEAD
 //-----------------------------------------------------------
 
 // PHASE 2 : Phase de vote
@@ -142,18 +130,14 @@ function startingVote() external onlyOwner {
 // require whitelisté et le bon state
 
 // 3 - Fin de la phase de vote
-<<<<<<< HEAD
 function endingVote() external onlyOwner {
     require(statut == WorkflowStatus.VotingSessionStarted);
     statut = WorkflowStatus.VotingSessionEnded;
     emit WorkflowStatusChange(WorkflowStatus.VotingSessionStarted, WorkflowStatus.VotingSessionEnded); // Envoie l'info à l'interface que le statut a changé
 }
 
-<<<<<<< HEAD
 //-----------------------------------------------------------
 
-=======
->>>>>>> e1791d06e3044e4d23b2f152eaec331e173f9a51
 // PHASE 3 : Phase de dépouillement des votes
 
 // 1 - Comptabilisation des votes
@@ -163,18 +147,11 @@ function endingVote() external onlyOwner {
 // Renseigne l'uint winningProposalId, ou alors placer la fonction getWinner
 
 // 3 - Fin de la phase de comptabilisation
-<<<<<<< HEAD
 function voteTallied() external onlyOwner {
-=======
-function startingVote() external onlyOwner {
->>>>>>> e1791d06e3044e4d23b2f152eaec331e173f9a51
     require(statut == WorkflowStatus.VotingSessionEnded);
     statut = WorkflowStatus.VotesTallied;
     emit WorkflowStatusChange(WorkflowStatus.VotingSessionEnded, WorkflowStatus.VotesTallied); // Envoie l'info à l'interface que le statut a changé
 }
-<<<<<<< HEAD
 
 
 }
-=======
->>>>>>> e1791d06e3044e4d23b2f152eaec331e173f9a51
