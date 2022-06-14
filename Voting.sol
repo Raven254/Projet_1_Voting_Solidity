@@ -59,7 +59,7 @@ function proposalsNumber() public view returns(uint){
     return proposals.length+1;
 }
 
-// 2 - Fonction pour observer les différentes propositions
+// 2 - Fonction pour observer les différentes propositions avec l'ID de celles-ci
 function seeProposalWith_ID(uint _id) external view returns(string memory) {
     return proposals[_id].description;
 }
@@ -102,9 +102,10 @@ function startingRegistration() external onlyOwner {
 
 // 2 - Enregistrement des propositions
 
-function propRegistration(string calldata _description) external {
+function proposalRegistration(string calldata _description) external {
     require(statut == WorkflowStatus.ProposalsRegistrationStarted, unicode"Erreur : l'enregistrement des propositions n'a pas encore démarré / est terminée. Vérifiez le [statut] du workflow.");
     require(votersID[msg.sender].isRegistered == true, unicode"Erreur : vous n'êtes pas enregistré pour voter.");
+    require(!proposalsID[msg.sender], unicode"Erreur : vous avez déjà soumis une proposition.");
     proposalsID[msg.sender] = Proposal(_description, 0);
     Proposal memory proposal = Proposal(_description, 0);
     proposals.push(proposal);
@@ -131,7 +132,7 @@ function startingVote() external onlyOwner {
 }
 
 // 2 - Enregistrement des votes
-function voteRegistration(uint _proposalId) external {
+function vote(uint _proposalId) external {
     require(statut == WorkflowStatus.VotingSessionStarted, unicode"Erreur : le vote n'a pas encore démarré / est terminé. Vérifiez le [statut] du workflow.");
     require(votersID[msg.sender].isRegistered == true, unicode"Erreur : vous n'êtes pas enregistré pour voter.");
     require(votersID[msg.sender].hasVoted == false, unicode"Erreur : vous avez déjà voté pour cette itération.");
