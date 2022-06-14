@@ -134,6 +134,13 @@ function startingVote() external onlyOwner {
 function registration(_proposalId) external {
     require(statut == WorkflowStatus.VotingSessionStarted);
     require(votersID[msg.sender].isRegistered == true);
+    require(votersID[msg.sender].hasVoted == false);
+    
+    proposals[_proposalId].voteCount += 1; // Ajoute un vote à la proposition
+    proposalsID[msg.sender].voteCount += 1;
+    
+    votersID[msg.sender].hasVoted = true; // Renseigne le vote de l'électeur
+    votersID[msg.sender].votedProposalId = _proposalId;
     
     emit Voted(msg.sender, _proposalId); // Envoie l'info du vote à l'interface
 }
