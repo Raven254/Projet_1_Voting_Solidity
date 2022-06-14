@@ -102,7 +102,7 @@ function startingRegistration() external onlyOwner {
 
 // 2 - Enregistrement des propositions
 
-function registration(string _description) external {
+function propRegistration(string _description) external {
     require(statut == WorkflowStatus.ProposalsRegistrationStarted, unicode"Exec Impossible : mauvaise étape. Vérifiez le [statut] du workflow.");
     require(votersID[msg.sender].isRegistered == true, unicode"Erreur : vous n'êtes pas enregistré pour voter.");
     proposalsID[msg.sender] = Proposal(_description, 0);
@@ -131,7 +131,7 @@ function startingVote() external onlyOwner {
 }
 
 // 2 - Enregistrement des votes
-function registration(_proposalId) external {
+function voteRegistration(uint _proposalId) external {
     require(statut == WorkflowStatus.VotingSessionStarted, unicode"Exec Impossible : mauvaise étape. Vérifiez le [statut] du workflow.");
     require(votersID[msg.sender].isRegistered == true, unicode"Erreur : vous n'êtes pas enregistré pour voter.");
     require(votersID[msg.sender].hasVoted == false, unicode"Erreur : vous avez déjà voté pour cette itération.");
@@ -160,7 +160,7 @@ function endingVote() external onlyOwner {
 function voteCounting() private view onlyOwner returns(uint) {
     uint memory IdCount = 0; // On garde cette variable pour suivre la proposition avec le max de votes.
     for(uint i = 1; i <= proposalsID - 1; i++) { // Boucle pour trouver le maximum, en comparant la clé i-1 avec la clé i.
-        if (proposals[i].voteCount > proposals[i-1].voteCount){
+        if (proposals[i].voteCount > proposals[i-1].voteCount){ // Cela peut occasionner un bug si 2 comptes sont égaux... Voir comment gérer
             IdCount = i;
         } else {
             IdCount = i-1;
@@ -169,8 +169,6 @@ function voteCounting() private view onlyOwner returns(uint) {
     winningProposalId = IdCount;
     return IdCount;
 }
-
-// Renseigne l'uint winningProposalId, ou alors placer la fonction getWinner
 
 // 2 - Fin de la phase de comptabilisation
 function voteTallied() external onlyOwner {
