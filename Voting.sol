@@ -157,9 +157,19 @@ function endingVote() external onlyOwner {
 // PHASE 3 : Phase de dépouillement des votes
 
 // 1 - Comptabilisation des votes
+function voteCounting() private view onlyOwner returns(uint) {
+    uint memory IdCount = 0; // On garde cette variable pour suivre la proposition avec le max de votes.
+    for(uint i = 1; i <= proposalsID - 1; i++) { // Boucle pour trouver le maximum, en comparant la clé i-1 avec la clé i.
+        if (proposals[i].voteCount > proposals[i-1].voteCount){
+            IdCount = i;
+        } else {
+            IdCount = i-1;
+        }
+    }
+    winningProposalId = IdCount;
+    return IdCount;
+}
 
-// *FONCTION COMPTABILISATION*
-// require le bon state + onlyOwner
 // Renseigne l'uint winningProposalId, ou alors placer la fonction getWinner
 
 // 2 - Fin de la phase de comptabilisation
