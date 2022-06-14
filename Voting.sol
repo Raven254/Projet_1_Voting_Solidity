@@ -83,8 +83,8 @@ WorkflowStatus public statut = WorkflowStatus.RegisteringVoters;
 
 // 2 - Whitelisting d'adresses par l'administrateur du vote
 function whitelist(address _address) external onlyOwner {
-    require(votersID[_address].isRegistered == false);
-    require(statut == WorkflowStatus.RegisteringVoters);
+    require(statut == WorkflowStatus.RegisteringVoters, unicode"Exec Impossible : mauvaise étape. Vérifiez le [statut] du workflow.");
+    require(votersID[_address].isRegistered == false, unicode"L'électeur est déjà enregistré.");
     votersID[_address].isRegistered = true;
     emit VoterRegistered(_address); // Envoie l'info à l'interface que l'électeur est enregistré
 }
@@ -95,7 +95,7 @@ function whitelist(address _address) external onlyOwner {
 
 // 1 - Changement de phase --> Enregistrement des propositions
 function startingRegistration() external onlyOwner {
-    require(statut == WorkflowStatus.RegisteringVoters);
+    require(statut == WorkflowStatus.RegisteringVoters, unicode"Changement de phase impossible : vérifiez le [statut] du workflow.");
     statut = WorkflowStatus.ProposalsRegistrationStarted;
     emit WorkflowStatusChange(WorkflowStatus.RegisteringVoters, WorkflowStatus.ProposalsRegistrationStarted); // Envoie l'info à l'interface que le statut a changé
 }
@@ -103,8 +103,8 @@ function startingRegistration() external onlyOwner {
 // 2 - Enregistrement des propositions
 
 function registration(string _description) external {
-    require(statut == WorkflowStatus.ProposalsRegistrationStarted);
-    require(votersID[msg.sender].isRegistered == true);
+    require(statut == WorkflowStatus.ProposalsRegistrationStarted, unicode"Exec Impossible : mauvaise étape. Vérifiez le [statut] du workflow.");
+    require(votersID[msg.sender].isRegistered == true, unicode"Erreur : vous n'êtes pas enregistré pour voter.");
     proposalsID[msg.sender] = Proposal(_description, 0);
     Proposal memory proposal = Proposal(_description, 0);
     proposals.push(proposal);
@@ -114,7 +114,7 @@ function registration(string _description) external {
 
 // 3 - Fin de la phase d'enregistrement
 function endingRegistration() external onlyOwner {
-    require(statut == WorkflowStatus.ProposalsRegistrationStarted);
+    require(statut == WorkflowStatus.ProposalsRegistrationStarted, unicode"Changement de phase impossible : vérifiez le [statut] du workflow.");
     statut = WorkflowStatus.ProposalsRegistrationEnded;
     emit WorkflowStatusChange(WorkflowStatus.ProposalsRegistrationStarted, WorkflowStatus.ProposalsRegistrationEnded); // Envoie l'info à l'interface que le statut a changé
 }
@@ -125,20 +125,20 @@ function endingRegistration() external onlyOwner {
 
 // 1 - Changement de phase --> Vote
 function startingVote() external onlyOwner {
-    require(statut == WorkflowStatus.ProposalsRegistrationEnded);
+    require(statut == WorkflowStatus.ProposalsRegistrationEnded, unicode"Changement de phase impossible : vérifiez le [statut] du workflow.");
     statut = WorkflowStatus.VotingSessionStarted;
     emit WorkflowStatusChange(WorkflowStatus.ProposalsRegistrationEnded, WorkflowStatus.VotingSessionStarted); // Envoie l'info à l'interface que le statut a changé
 }
 
 // 2 - Enregistrement des votes
 function registration(_proposalId) external {
-    require(statut == WorkflowStatus.VotingSessionStarted);
-    require(votersID[msg.sender].isRegistered == true);
-    require(votersID[msg.sender].hasVoted == false);
+    require(statut == WorkflowStatus.VotingSessionStarted, unicode"Exec Impossible : mauvaise étape. Vérifiez le [statut] du workflow.");
+    require(votersID[msg.sender].isRegistered == true, unicode"Erreur : vous n'êtes pas enregistré pour voter.");
+    require(votersID[msg.sender].hasVoted == false, unicode"Erreur : vous avez déjà voté pour cette itération.");
     
     proposals[_proposalId].voteCount += 1; // Ajoute un vote à la proposition
     proposalsID[msg.sender].voteCount += 1;
-    
+
     votersID[msg.sender].hasVoted = true; // Renseigne le vote de l'électeur
     votersID[msg.sender].votedProposalId = _proposalId;
     
@@ -147,7 +147,7 @@ function registration(_proposalId) external {
 
 // 3 - Fin de la phase de vote
 function endingVote() external onlyOwner {
-    require(statut == WorkflowStatus.VotingSessionStarted);
+    require(statut == WorkflowStatus.VotingSessionStarted, unicode"Changement de phase impossible : vérifiez le [statut] du workflow.");
     statut = WorkflowStatus.VotingSessionEnded;
     emit WorkflowStatusChange(WorkflowStatus.VotingSessionStarted, WorkflowStatus.VotingSessionEnded); // Envoie l'info à l'interface que le statut a changé
 }
@@ -164,7 +164,7 @@ function endingVote() external onlyOwner {
 
 // 2 - Fin de la phase de comptabilisation
 function voteTallied() external onlyOwner {
-    require(statut == WorkflowStatus.VotingSessionEnded);
+    require(statut == WorkflowStatus.VotingSessionEnded, unicode"Changement de phase impossible : vérifiez le [statut] du workflow.");
     statut = WorkflowStatus.VotesTallied;
     emit WorkflowStatusChange(WorkflowStatus.VotingSessionEnded, WorkflowStatus.VotesTallied); // Envoie l'info à l'interface que le statut a changé
 }
