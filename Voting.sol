@@ -190,6 +190,10 @@ contract Voting is Ownable {
         return winningProposalId;
     }
 
+    // Améliorations à apporter :
+    // Prise en compte des propositions gagnantes ayant le même nombre de voix dans le décompte
+    // Ajouter la possibilité de lancer un nouveau vote
+    
     //-----------------------------------------------------------
     //----------------FIN DU SMART CONTRACT----------------------
     //-----------------------------------------------------------
