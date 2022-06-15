@@ -63,7 +63,7 @@ function proposalsNumber() public view returns(uint){
     return proposals.length;
 }
 
-// 2 - Fonction pour observer les différentes propositions avec l'ID de celles-ci
+// 2 - Fonction pour observer les différentes propositions grâce à leur ID
 function seeProposalWith_ID(uint _id) external view returns(string memory) {
     return proposals[_id].description;
 }
@@ -83,7 +83,7 @@ function seeProposalWith_Addr(address _address) external view returns(string mem
 
 // PHASE 0 : Enregistrement des électeurs
 // 1.a - Définition du statut par défaut du workflow : enregistrement des électeurs
-WorkflowStatus public statut = WorkflowStatus.RegisteringVoters;
+WorkflowStatus internal statut = WorkflowStatus.RegisteringVoters;
 
 // 1.b - Fonction pour revenir à RegisteringVoters, au cas où
 function startingRegisteringVoters() external onlyOwner {
@@ -119,8 +119,8 @@ function proposalsRegistration(string calldata _description) external {
     require(votersID[msg.sender].isRegistered == true, unicode"Erreur : vous n'êtes pas enregistré pour voter.");
     require(!suiviProposition[msg.sender], unicode"Erreur : vous avez déjà soumis une proposition.");
     proposalsID[msg.sender] = Proposal(_description, 0);
-    Proposal memory proposal = Proposal(_description, 0);
-    proposals.push(proposal);
+    Proposal memory _proposal = Proposal(_description, 0);
+    proposals.push(_proposal);
     emit ProposalRegistered(proposalId);
     suiviProposition[msg.sender] = true;
     proposalId += 1;
@@ -173,18 +173,18 @@ function endingVote() external onlyOwner {
 // 1 - Comptabilisation des votes
 function voteCounting() external onlyOwner returns(uint) {
     require(statut == WorkflowStatus.VotingSessionEnded);
-    uint IdCount = 0; // On garde cette variable pour suivre la proposition avec le max de votes.
-    for(uint i = 1; i <= proposals.length - 1; i++) { // Boucle pour trouver le maximum, en comparant la clé i-1 avec la clé i.
-        if (proposals[i].voteCount > proposals[i-1].voteCount){ // Cela peut occasionner un bug si 2 comptes sont égaux... Voir comment gérer
-            IdCount = i;
-        } else {
-            IdCount = i-1;
+    uint electedProposal = 0;
+    uint maxVotes = 0;
+    for(uint i = 0; i <= proposals.length - 1; i++) { // Boucle pour trouver le maximum parmi toutes les propositions.
+        if (proposals[i].voteCount > maxVotes){ // Cela peut occasionner un bug si 2 comptes sont égaux... Voir comment gérer
+            electedProposal = i;
+            maxVotes = proposals[i].voteCount;
         }
+        winningProposalId = electedProposal;
     }
-    winningProposalId = IdCount;
     statut = WorkflowStatus.VotesTallied;
     emit WorkflowStatusChange(WorkflowStatus.VotingSessionEnded, WorkflowStatus.VotesTallied); // Envoie l'info à l'interface que le statut a changé
-    return IdCount;
+    return winningProposalId;
 }
 
 }
