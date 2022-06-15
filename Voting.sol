@@ -27,6 +27,9 @@ VotingSessionEnded,
 VotesTallied
 }
 
+// Définition d'un statut par défaut du workflow : enregistrement des électeurs
+WorkflowStatus internal statut = WorkflowStatus.RegisteringVoters;
+
 // Définition des structures, une pour les électeurs, une pour les propositions
 struct Voter {
 bool isRegistered;
@@ -65,15 +68,20 @@ function proposalsNumber() public view returns(uint){
 
 // 2 - Fonction pour observer les différentes propositions grâce à leur ID
 function seeProposalWith_ID(uint _id) external view returns(string memory) {
-    return proposals[_id].description;
+    return (proposals[_id].description, proposals[_id].voteCount);
 }
 
-// 3 - Fonction pour retrouver la proposition d'une adresse --> [UTILITE?]
+// 3 - Fonction pour retrouver la proposition partagée par une adresse --> [UTILITE?]
 function seeProposalWith_Addr(address _address) external view returns(string memory, uint) {
     return (proposalsID[_address].description, proposalsID[_address].voteCount);
 }
 
-// 4 - Fonction pour retourner à l'étape d'enregistrement des électeurs et tout recommencer
+// 4 - Fonction pour récupérer le statut
+function getStatut() external view returns(WorkflowStatus) {
+    return statut;
+}
+
+// 5 - Fonction pour retourner à l'étape d'enregistrement des électeurs et tout recommencer
 // function à faire dans un second temps s'il me reste du temps
 
 
@@ -82,10 +90,8 @@ function seeProposalWith_Addr(address _address) external view returns(string mem
 //-----------------------------------------------------------
 
 // PHASE 0 : Enregistrement des électeurs
-// 1.a - Définition du statut par défaut du workflow : enregistrement des électeurs
-WorkflowStatus internal statut = WorkflowStatus.RegisteringVoters;
 
-// 1.b - Fonction pour revenir à RegisteringVoters, au cas où
+// 1 - Fonction pour revenir à RegisteringVoters, au cas où
 function startingRegisteringVoters() external onlyOwner {
     require(statut != WorkflowStatus.RegisteringVoters, unicode"Vous êtes déjà en phase d'enregistrement des électeurs.");
     emit WorkflowStatusChange(statut, WorkflowStatus.RegisteringVoters); // Envoie l'info à l'interface que le statut a changé
