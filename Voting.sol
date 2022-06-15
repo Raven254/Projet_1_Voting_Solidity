@@ -179,14 +179,12 @@ function endingVote() external onlyOwner {
 // 1 - Comptabilisation des votes
 function voteCounting() external onlyOwner returns(uint) {
     require(statut == WorkflowStatus.VotingSessionEnded);
-    uint electedProposal = 0;
     uint maxVotes = 0;
     for(uint i = 0; i <= proposals.length - 1; i++) { // Boucle pour trouver le maximum parmi toutes les propositions.
-        if (proposals[i].voteCount > maxVotes){ // Cela peut occasionner un bug si 2 comptes sont égaux... Voir comment gérer
-            electedProposal = i;
+        if (proposals[i].voteCount > maxVotes){ // Cela peut occasionner un bug si 2 propositions ont le même nombre de voix... Voir comment gérer
+            winningProposalId = i;
             maxVotes = proposals[i].voteCount;
         }
-        winningProposalId = electedProposal;
     }
     statut = WorkflowStatus.VotesTallied;
     emit WorkflowStatusChange(WorkflowStatus.VotingSessionEnded, WorkflowStatus.VotesTallied); // Envoie l'info à l'interface que le statut a changé
